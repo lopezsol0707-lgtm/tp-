@@ -36,7 +36,7 @@ export function Resumen({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="relative overflow-hidden rounded-[calc(var(--radius)+6px)] px-5 py-7 sm:px-9 sm:py-9"
+      className="hero-vivo relative overflow-hidden rounded-[calc(var(--radius)+6px)] px-5 py-7 sm:px-9 sm:py-9"
       style={{ background: 'var(--hero)', color: 'var(--hero-ink)' }}
     >
       <h1 className="titulo max-w-2xl text-[36px] sm:text-[52px]">
@@ -75,6 +75,7 @@ export function Resumen({
                 : 'Sin entregas cargadas.'
           }
           alerta={enRiesgo > 0}
+          orden={1}
         />
         <Dato
           icono={<CalendarHeart size={20} aria-hidden />}
@@ -95,6 +96,7 @@ export function Resumen({
               </button>
             ) : null
           }
+          orden={2}
         />
       </div>
     </motion.section>
@@ -107,15 +109,24 @@ function Dato({
   texto,
   alerta,
   accion,
+  orden,
 }: {
   icono: React.ReactNode
   titulo: string
   texto: string
   alerta?: boolean
   accion?: React.ReactNode
+  orden?: number
 }) {
   return (
-    <div className="flex gap-3 rounded-2xl p-3.5" style={{ background: 'var(--hero-chip)' }}>
+    <motion.div
+      initial={{ opacity: 0, y: 14, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24, delay: 0.25 + (orden ?? 0) * 0.08 }}
+      whileHover={{ y: -3 }}
+      className="flex gap-3 rounded-2xl p-3.5 backdrop-blur-sm"
+      style={{ background: 'var(--hero-chip)' }}
+    >
       <span
         className={`grid size-10 shrink-0 place-items-center rounded-full ${alerta ? 'bg-danger text-white' : 'bg-surface text-primary'}`}
       >
@@ -126,6 +137,6 @@ function Dato({
         <p className="mt-0.5 text-[14px] font-semibold leading-snug opacity-80">{texto}</p>
         {accion}
       </div>
-    </div>
+    </motion.div>
   )
 }

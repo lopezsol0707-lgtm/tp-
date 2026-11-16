@@ -1,4 +1,4 @@
-import { CalendarDays, ListTodo, Plus, RotateCw, Sparkles, Zap } from 'lucide-react'
+import { CalendarDays, ListTodo, Plus, RotateCcw, RotateCw, Sparkles, Zap } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Agenda } from './components/Agenda'
 import { Avisos, type Aviso } from './components/Avisos'
@@ -8,7 +8,9 @@ import { Hoja } from './components/Hoja'
 import { ListaTareas } from './components/ListaTareas'
 import { Resumen } from './components/Resumen'
 import { Boton, Segmentado } from './components/ui'
-import { actualizarTarea, cargarEjemplo, crearTarea, eliminarTarea } from './data/tareas'
+import { Confirmar } from './components/Confirmar'
+import { Estadisticas } from './components/Estadisticas'
+import { actualizarTarea, cargarEjemplo, crearTarea, eliminarTarea, reiniciarEjemplo } from './data/tareas'
 import { aClave, hoy, lunesDe, sumarDias } from './fechas'
 import { useFeriados, useTareas } from './hooks/useDatos'
 import { asignarColores } from './materias'
@@ -39,6 +41,7 @@ export default function App() {
   const [form, setForm] = useState<Formulario>(null)
   const [aBorrar, setABorrar] = useState<Tarea | null>(null)
   const [cargandoEjemplo, setCargandoEjemplo] = useState(false)
+  const [pedirReinicio, setReiniciar] = useState(false)
   const [avisos, setAvisos] = useState<Aviso[]>([])
   const proximoAviso = useRef(1)
 
@@ -94,7 +97,7 @@ export default function App() {
     setCargandoEjemplo(true)
     try {
       await cargarEjemplo(uid)
-      avisar('ok', 'Cargamos 6 tareas de ejemplo.')
+      avisar('ok', 'Cargamos el ejemplo.')
     } catch {
       avisar('error', 'No pudimos cargar el ejemplo. Probá de nuevo.')
     } finally {
@@ -102,9 +105,40 @@ export default function App() {
     }
   }
 
+  // La primera vez que alguien entra, le cargamos el ejemplo automáticamente.
+  // Después, lo que cambie (o borre) queda guardado en Firestore.
+  const sembrando = useRef(false)
+  useEffect(() => {
+    if (!uid || cargando || error || tareas.length > 0 || sembrando.current) return
+    const clave = `entrega.ejemplo.${uid}`
+    let yaSembrado = false
+    try {
+      yaSembrado = localStorage.getItem(clave) === '1'
+      localStorage.setItem(clave, '1')
+    } catch {
+      /* sin almacenamiento local: sembramos igual una sola vez por sesión */
+    }
+    if (yaSembrado) return
+    sembrando.current = true
+    cargarEjemplo(uid).catch(() => avisar('error', 'No pudimos cargar el ejemplo inicial.'))
+  }, [uid, cargando, error, tareas.length, avisar])
+
+  async function reiniciar() {
+    if (!uid) return
+    try {
+      await reiniciarEjemplo(uid, tareas)
+      setReiniciar(false)
+      setLunes(lunesDe(hoy()))
+      avisar('ok', 'Listo, volvió todo como al principio.')
+    } catch {
+      avisar('error', 'No pudimos reiniciar. Probá de nuevo.')
+    }
+  }
+
   const abrir = (t: Tarea) => setForm({ modo: 'editar', tarea: t })
   const cerrarForm = useCallback(() => setForm(null), [])
   const cancelarBorrar = useCallback(() => setABorrar(null), [])
+  const cerrarReinicio = useCallback(() => setReiniciar(false), [])
   const nueva = () => setForm({ modo: 'nueva' })
 
   return (
@@ -202,11 +236,28 @@ export default function App() {
                     />
                   </div>
                 </div>
+
+                <Estadisticas tareas={tareas} plan={plan} feriados={feriados} horario={HORARIO} hoyClave={hoyClave} />
               </>
             )}
           </>
         )}
       </main>
+
+      <footer className="mt-12 flex flex-col items-center gap-2 text-center text-[13px] font-semibold text-muted">
+        <p>Feriados nacionales: API de ArgentinaDatos. Tus tareas se guardan en Firebase.</p>
+        {uid && !cargando && (
+          <button
+            type="button"
+            onClick={() => setReiniciar(true)}
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 underline-offset-4 hover:bg-chip hover:text-ink hover:underline"
+          >
+            <RotateCcw size={14} aria-hidden />
+            Volver al ejemplo inicial
+          </button>
+        )}
+      </footer>
+      <Confirmar abierto={pedirReinicio} onConfirmar={reiniciar} onCancelar={cerrarReinicio} />
 
       <Hoja
         abierta={!!form}

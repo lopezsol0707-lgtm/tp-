@@ -95,8 +95,27 @@ button:disabled {
   }
 }
 
+/* El fondo del encabezado se mueve lento, como una luz que respira */
+.hero-vivo {
+  background-size: 160% 160% !important;
+  animation: deriva 16s ease-in-out infinite alternate;
+}
+
+@keyframes deriva {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 40%;
+  }
+  100% {
+    background-position: 30% 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .brillo {
+  .brillo,
+  .hero-vivo {
     animation: none;
   }
 }

@@ -15,23 +15,40 @@ export function useTareas() {
   useEffect(() => {
     let cortar: (() => void) | undefined
     let vigente = true
+    let reintentos = 0
+
+    // Un usuario anónimo recién creado puede tardar un instante en tener
+    // permiso en Firestore. Si la primera lectura rebota, reintentamos solos.
+    const escuchar = (uidActual: string) => {
+      cortar = escucharTareas(
+        uidActual,
+        (lista) => {
+          setTareas(lista)
+          setError(null)
+          setCargando(false)
+        },
+        (e) => {
+          if (!vigente) return
+          const code = (e as { code?: string }).code
+          if (code === 'permission-denied' && reintentos < 4) {
+            reintentos++
+            cortar?.()
+            window.setTimeout(() => vigente && escuchar(uidActual), 400 * reintentos)
+            return
+          }
+          console.error('Firestore:', e)
+          setError('No pudimos leer tus tareas. Revisá tu conexión.')
+          setCargando(false)
+        },
+      )
+    }
+
     asegurarUsuario()
-      .then((u) => {
+      .then(async (u) => {
+        await u.getIdToken()
         if (!vigente) return
         setUid(u.uid)
-        cortar = escucharTareas(
-          u.uid,
-          (lista) => {
-            setTareas(lista)
-            setError(null)
-            setCargando(false)
-          },
-          (e) => {
-            console.error('Firestore:', e)
-            setError('No pudimos leer tus tareas. Revisá tu conexión.')
-            setCargando(false)
-          },
-        )
+        escuchar(u.uid)
       })
       .catch((e) => {
         console.error('Auth:', e)

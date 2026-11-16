@@ -41,20 +41,59 @@ export async function eliminarTarea(uid: string, id: string): Promise<void> {
   await deleteDoc(doc(db, 'usuarios', uid, 'tareas', id))
 }
 
-/** Carga tareas de ejemplo para probar la app sin escribir todo a mano. */
-export async function cargarEjemplo(uid: string): Promise<void> {
+/**
+ * El ejemplo inicial: la semana de una estudiante de Diseño Digital a fin de
+ * cuatrimestre. Las fechas se calculan desde hoy para que siempre esté vigente.
+ */
+function armarEjemplo(): Omit<Tarea, 'id'>[] {
   const h = hoy()
-  const ejemplo: DatosTarea[] = [
-    { titulo: 'Maqueta final', materia: 'Diseño 3', duracionMin: 360, fechaLimite: sumarDias(h, 6), prioridad: 'alta' },
-    { titulo: 'Prototipo en Figma', materia: 'UX/UI', duracionMin: 240, fechaLimite: sumarDias(h, 3), prioridad: 'alta' },
-    { titulo: 'Leer apunte de semiótica', materia: 'Comunicación', duracionMin: 90, fechaLimite: sumarDias(h, 2), prioridad: 'media' },
-    { titulo: 'Bitácora del TP', materia: 'Frontend II', duracionMin: 120, fechaLimite: sumarDias(h, 1), prioridad: 'alta' },
-    { titulo: 'Animación del logo', materia: 'Motion', duracionMin: 180, fechaLimite: sumarDias(h, 9), prioridad: 'media' },
-    { titulo: 'Paleta y tipografías', materia: 'Diseño 3', duracionMin: 60, fechaLimite: sumarDias(h, 4), prioridad: 'baja' },
+  const dia = 86_400_000
+  const ahora = Date.now()
+  const hechas: [string, string, number, number][] = [
+    ['Entrevistas a usuarios', 'Diseño de Interfaces', 180, 9],
+    ['Primera versión del TP2', 'Frontend II', 240, 8],
+    ['Paleta y tipografías de la cafetería', 'Identidad Visual', 60, 6],
+    ['Guion del spot de 30 segundos', 'Motion Graphics', 120, 5],
+    ['Wireframes de la app', 'Diseño de Interfaces', 240, 3],
+    ['Bocetos para Taller 4', 'Taller 4', 150, 2],
   ]
+  const pendientes: DatosTarea[] = [
+    { titulo: 'Bitácora y capturas del TP2', materia: 'Frontend II', duracionMin: 120, fechaLimite: sumarDias(h, 1), prioridad: 'alta' },
+    { titulo: 'Ensayar la exposición oral', materia: 'Frontend II', duracionMin: 90, fechaLimite: sumarDias(h, 1), prioridad: 'alta' },
+    { titulo: 'Láminas de presentación', materia: 'Taller 4', duracionMin: 480, fechaLimite: sumarDias(h, 1), prioridad: 'alta' },
+    { titulo: 'Leer Barthes: Retórica de la imagen', materia: 'Semiótica', duracionMin: 90, fechaLimite: sumarDias(h, 2), prioridad: 'media' },
+    { titulo: 'Moodboard para la cafetería', materia: 'Identidad Visual', duracionMin: 150, fechaLimite: sumarDias(h, 3), prioridad: 'media' },
+    { titulo: 'Prototipo navegable en Figma', materia: 'Diseño de Interfaces', duracionMin: 360, fechaLimite: sumarDias(h, 4), prioridad: 'alta' },
+    { titulo: 'Storyboard del spot', materia: 'Motion Graphics', duracionMin: 180, fechaLimite: sumarDias(h, 6), prioridad: 'media' },
+    { titulo: 'Render final del spot', materia: 'Motion Graphics', duracionMin: 540, fechaLimite: sumarDias(h, 9), prioridad: 'alta' },
+    { titulo: 'Manual de marca', materia: 'Identidad Visual', duracionMin: 300, fechaLimite: sumarDias(h, 11), prioridad: 'baja' },
+  ]
+  return [
+    ...hechas.map(([titulo, materia, duracionMin, haceDias], i) => ({
+      titulo,
+      materia,
+      duracionMin,
+      fechaLimite: sumarDias(h, -haceDias + 1),
+      prioridad: 'media' as const,
+      hecha: true,
+      creadaEn: ahora - (haceDias + 3) * dia + i,
+      hechaEn: ahora - haceDias * dia,
+    })),
+    ...pendientes.map((t, i) => ({ ...t, hecha: false, creadaEn: ahora - 2 * dia + i * 60_000, hechaEn: null })),
+  ]
+}
+
+/** Carga el ejemplo inicial en Firestore. */
+export async function cargarEjemplo(uid: string): Promise<void> {
   const lote = writeBatch(db)
-  ejemplo.forEach((t, i) => {
-    lote.set(doc(coleccion(uid)), { ...t, hecha: false, creadaEn: Date.now() + i, hechaEn: null })
-  })
+  armarEjemplo().forEach((t) => lote.set(doc(coleccion(uid)), t))
+  await lote.commit()
+}
+
+/** Borra todas las tareas y vuelve a dejar el ejemplo inicial. */
+export async function reiniciarEjemplo(uid: string, actuales: Tarea[]): Promise<void> {
+  const lote = writeBatch(db)
+  actuales.forEach((t) => lote.delete(doc(db, 'usuarios', uid, 'tareas', t.id)))
+  armarEjemplo().forEach((t) => lote.set(doc(coleccion(uid)), t))
   await lote.commit()
 }

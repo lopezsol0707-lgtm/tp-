@@ -18,8 +18,21 @@ const app = initializeApp({
 export const auth = getAuth(app)
 export const db = getFirestore(app)
 
-/** Devuelve el usuario actual; si no hay, entra como anónimo. */
+let pendiente: Promise<User> | null = null
+
+/**
+ * Devuelve el usuario actual; si no hay, entra como anónimo.
+ * Se guarda la promesa para no crear dos usuarios si se llama dos veces seguidas.
+ */
 export function asegurarUsuario(): Promise<User> {
+  pendiente ??= crearOObtenerUsuario().catch((e) => {
+    pendiente = null
+    throw e
+  })
+  return pendiente
+}
+
+function crearOObtenerUsuario(): Promise<User> {
   return new Promise((resolve, reject) => {
     const cortar = onAuthStateChanged(
       auth,

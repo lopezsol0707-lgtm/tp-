@@ -2,13 +2,14 @@ import type { CSSProperties } from 'react'
 import type { Tarea } from './tipos'
 
 /** Paleta de materias: cada una recibe un color distinto. */
+// Orden validado para daltonismo (los colores vecinos se distinguen entre sí).
 const COLORES = [
-  { fondo: '#ffe2d4', tinta: '#8f2c00', fuerte: '#ff5b1f' },
-  { fondo: '#d6efff', tinta: '#0b4a73', fuerte: '#1c8fd6' },
-  { fondo: '#fff0c2', tinta: '#6e4d00', fuerte: '#f2a900' },
-  { fondo: '#d9f4e8', tinta: '#0b5c3e', fuerte: '#13a46b' },
-  { fondo: '#ffdcea', tinta: '#8c1645', fuerte: '#f0457f' },
-  { fondo: '#e9f6c9', tinta: '#3d5a00', fuerte: '#7fb800' },
+  { fondo: '#fde3d7', tinta: '#8f3510', fuerte: '#eb6834' },
+  { fondo: '#dbe9fa', tinta: '#184f95', fuerte: '#2a78d6' },
+  { fondo: '#d3f3e7', tinta: '#0c6646', fuerte: '#1baf7a' },
+  { fondo: '#fff0c4', tinta: '#6b4800', fuerte: '#eda100' },
+  { fondo: '#fbe0ea', tinta: '#8c2350', fuerte: '#e87ba4' },
+  { fondo: '#d6efd6', tinta: '#0b5a0b', fuerte: '#008300' },
 ]
 
 const asignados = new Map<string, number>()
