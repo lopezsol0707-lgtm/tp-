@@ -4,6 +4,10 @@ Agenda automática para estudiantes. Cargás cada entrega con cuánto tiempo te 
 
 Trabajo Práctico 2, Desarrollo Frontend II (UADE).
 
+La primera vez que entrás, la app carga sola un **ejemplo realista** (la semana de una estudiante de Diseño Digital a fin de cuatrimestre). Todo lo que cambies queda guardado. Abajo de todo está el botón **Volver al ejemplo inicial** para dejarlo como al principio.
+
+Además tiene una sección de **gráficos**: avance (tareas hechas), horas pendientes por materia y carga de los próximos 12 días.
+
 ## Tecnologías
 
 - **React 19 + Vite + TypeScript**

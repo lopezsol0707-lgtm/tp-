@@ -147,11 +147,18 @@ function VistaSemana({ dias, bloques, tareas, feriados, horario, hoyClave, ahora
                   exit={{ opacity: 0, scale: 0.9 }}
                   whileHover={{ scale: 1.03, zIndex: 5 }}
                   transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-                  className="absolute inset-x-1 overflow-hidden rounded-xl border-l-4 px-2 py-1 text-left"
+                  className="absolute inset-x-1 flex flex-col items-start justify-start overflow-hidden rounded-xl border-l-4 px-2 py-1 text-left hyphens-auto [overflow-wrap:anywhere]"
                   style={{ ...estiloBloque(t.materia), top: (b.inicio - horario.inicio) * PX_POR_MIN + 1.5, height: altoBloque }}
                   aria-label={`${t.titulo}, ${hora(b.inicio)} a ${hora(b.fin)}`}
+                  title={`${t.titulo} (${t.materia}), ${hora(b.inicio)} a ${hora(b.fin)}`}
                 >
-                  <p className="truncate text-[12.5px] font-extrabold leading-tight">{t.titulo}</p>
+                  <p
+                    className={`w-full text-[12.5px] font-extrabold leading-tight ${
+                      altoBloque > 70 ? 'line-clamp-3' : altoBloque > 48 ? 'line-clamp-2' : 'truncate'
+                    }`}
+                  >
+                    {t.titulo}
+                  </p>
                   {altoBloque > 40 && (
                     <p className="truncate text-[11.5px] font-semibold leading-tight opacity-80">
                       {hora(b.inicio)} a {hora(b.fin)}
