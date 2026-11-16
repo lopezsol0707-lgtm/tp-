@@ -74,7 +74,7 @@ Registro del proceso, desde la idea hasta cada versión publicada. Herramienta d
 - **Pantallas:** celular de 360 px (sin scroll horizontal) y computadora de 1366 px.
 - `npm run lint` sin advertencias y `npm run build` sin errores.
 
-### Capturas
+### Capturas de la v1
 
 En `docs/capturas/`:
 
@@ -84,3 +84,35 @@ En `docs/capturas/`:
 - `v1-05` y `v1-06`: ejemplo cargado y semana completa (con el problema de los colores repetidos).
 - `v1-07` y `v1-08`: celular, con la agenda del día y una tarea marcada como hecha.
 - `v1-09`: la versión publicada en Vercel.
+
+---
+
+## Versión 2: ejemplo real, reinicio, gráficos y animaciones (16/11)
+
+**Pedidos a la IA:** "Hacé un ejemplo con cosas reales que se cargue solo, que si toco o borro algo quede guardado aunque recargue, y un botoncito abajo para volver todo como estaba al inicio." y "Metele más diseño: animaciones y algunos gráficos."
+
+**Qué cambió**
+
+- La primera vez que alguien entra se carga solo un ejemplo realista: la semana de una estudiante de Diseño Digital a fin de cuatrimestre (15 tareas, 6 hechas, una que no llega). Lo que se cambie queda guardado en Firestore.
+- Botón "Volver al ejemplo inicial" abajo de todo, con confirmación.
+- Sección "Cómo venís" con tres gráficos animados: anillo de avance, dona de horas pendientes por materia y barras apiladas con la carga de los próximos 12 días (con detalle al pasar el mouse).
+- Fondo del encabezado en movimiento lento y tarjetas que entran escalonadas.
+- Paleta de materias validada para daltonismo.
+
+**Problemas y soluciones**
+
+| Problema | Solución |
+|---|---|
+| Con un usuario nuevo, la primera carga daba "Missing or insufficient permissions" (captura `v2-01`). En desarrollo, React arranca la app dos veces y se creaban dos usuarios anónimos distintos. | El usuario se crea una sola vez (se guarda la promesa) y la lectura reintenta sola si rebota. |
+| En la dona se cortaban los nombres de las materias y en las barras "Dom 22" se partía en dos líneas (captura `v2-02`). | Leyenda debajo de la dona y días en dos renglones (inicial y número). |
+| Las horas salían con punto ("7.5 h"). | Formato argentino con coma: "7,5 h". |
+
+**Verificación:** se subió a GitHub, se publicó en Vercel y se abrió la URL con un navegador limpio. El ejemplo se cargó solo, se modificó, se recargó y los cambios seguían (captura `v2-04`).
+
+## Versión 3: retoques finales (16/11)
+
+- En la agenda semanal los títulos largos se cortaban (captura `v3-01`). Ahora ocupan hasta tres renglones, arrancan arriba del bloque y al pasar el mouse se ve el nombre completo (captura `v3-02`).
+- Ícono propio para la pestaña del navegador (antes era el de Vite).
+- README actualizado.
+
+**Verificación:** nueva publicación en Vercel y revisión de la URL de producción (captura `v3-03`).

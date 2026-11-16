@@ -37,8 +37,18 @@ TP2 de Desarrollo Frontend II (UADE, FADI, martes mañana). Joaquín lo arma par
 
 - (nada aprobado explícitamente todavía)
 
-## Pendientes / ideas para v2 y v3
+## Versiones publicadas
 
-- v2: horario configurable (días y horas) guardado en Firestore; animación de reacomodo más visible.
-- v3: estadísticas por materia, pulido final, favicon propio (hoy es el de Vite), informe.
-- Bundle de 500 KB+ (Firebase): se podría dividir, no es urgente.
+- v1: agenda + Firestore + auth anónima + API feriados.
+- v2: ejemplo realista que se siembra solo la primera vez (flag `entrega.ejemplo.{uid}` en localStorage), botón "Volver al ejemplo inicial" (`reiniciarEjemplo`), gráficos (Estadisticas.tsx), hero animado. Fix: `asegurarUsuario` cachea la promesa (StrictMode creaba 2 anónimos) + reintento ante permission-denied.
+- v3: títulos de bloques con line-clamp, favicon propio, README.
+
+## Textos de entrega (fuera del repo, a propósito)
+
+- `C:\Users\joaqu\entrega-textos\`: "Entregá - Informe y bitácora" y "Entregá - Machete para la exposición" (.docx y .pdf). Generados con un script docx-js en el scratchpad de la sesión. El machete NO va al repo (es para la prima que expone).
+- Prompts del informe: reformulados de los pedidos reales de Joaquín, sin inventar pasos.
+
+## Pendientes / ideas
+
+- Horario configurable (días y horas) guardado en Firestore.
+- Bundle de 500 KB+ (Firebase): se podría dividir.
