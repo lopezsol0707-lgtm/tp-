@@ -26,3 +26,4 @@ dist-ssr
 # Variables de entorno (Firebase)
 .env
 .env.local
+.vercel
