@@ -1,0 +1,30 @@
+rules_version = '2';
+
+// Cada visitante entra con una cuenta anónima de Firebase y solo puede
+// leer y escribir SUS tareas: usuarios/{su uid}/tareas/{tarea}.
+// Todo lo demás queda cerrado.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function esDueno(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function tareaValida(t) {
+      return t.keys().hasOnly(['titulo', 'materia', 'duracionMin', 'fechaLimite', 'prioridad', 'hecha', 'creadaEn', 'hechaEn'])
+        && t.titulo is string && t.titulo.size() >= 2 && t.titulo.size() <= 60
+        && t.materia is string && t.materia.size() >= 1 && t.materia.size() <= 30
+        && t.duracionMin is int && t.duracionMin >= 15 && t.duracionMin <= 1200
+        && t.fechaLimite is string && t.fechaLimite.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && t.prioridad in ['alta', 'media', 'baja']
+        && t.hecha is bool
+        && t.creadaEn is int
+        && (t.hechaEn == null || t.hechaEn is int);
+    }
+
+    match /usuarios/{uid}/tareas/{tareaId} {
+      allow read, delete: if esDueno(uid);
+      allow create, update: if esDueno(uid) && tareaValida(request.resource.data);
+    }
+  }
+}

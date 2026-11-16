@@ -1,0 +1,102 @@
+@import 'tailwindcss';
+
+:root {
+  --bg: #fff5ea;
+  --surface: #ffffff;
+  --ink: #22150f;
+  --muted: #74594a;
+  --line: #f0dccb;
+  --chip: #fde9d6;
+  --primary: #ff5b1f;
+  --primary-ink: #ffffff;
+  --danger: #c81e3a;
+  --hero-ink: #22150f;
+  --hero:
+    radial-gradient(60% 80% at 10% 0%, #ffc93c 0%, transparent 60%),
+    radial-gradient(50% 80% at 95% 15%, #ff8fb1 0%, transparent 60%),
+    radial-gradient(60% 90% at 65% 125%, #ffb38a 0%, transparent 60%), #ff6a2b;
+  --hero-chip: rgba(255, 255, 255, 0.58);
+  --shadow-card: 0 1px 2px rgba(80, 40, 10, 0.06), 0 18px 40px -24px rgba(150, 70, 20, 0.45);
+  --radius: 28px;
+  --f-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --f-body: 'Figtree', system-ui, sans-serif;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-chip: var(--chip);
+  --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
+  --color-danger: var(--danger);
+  --font-display: var(--f-display);
+  --font-body: var(--f-body);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.titulo {
+  font-family: var(--f-display);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sombra {
+  box-shadow: var(--shadow-card);
+}
+
+/* Días libres y feriados en la agenda */
+.rayado {
+  background: repeating-linear-gradient(-45deg, var(--chip) 0 8px, var(--bg) 8px 16px);
+}
+
+.brillo {
+  background: linear-gradient(100deg, var(--chip) 30%, var(--surface) 50%, var(--chip) 70%);
+  background-size: 300% 100%;
+  animation: brillo 1.4s ease-in-out infinite;
+}
+
+@keyframes brillo {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brillo {
+    animation: none;
+  }
+}
