@@ -3,25 +3,11 @@ import { CalendarOff, ChevronLeft, ChevronRight, PartyPopper } from 'lucide-reac
 import { useState } from 'react'
 import { diaCorto, diaLargo, desdeClave, duracion, hora, mesLargo, sumarDias } from '../fechas'
 import { colorMateria, estiloBloque } from '../materias'
-import type { Bloque, Horario, Tarea } from '../tipos'
 import { BotonIcono } from './ui'
 
 const PX_POR_MIN = 1.1
 
-interface Props {
-  lunes: string
-  onCambiarSemana: (delta: number) => void
-  onHoy: () => void
-  bloques: Bloque[]
-  tareas: Record<string, Tarea>
-  feriados: Map<string, string>
-  horario: Horario
-  hoyClave: string
-  ahoraMin: number
-  onAbrir: (t: Tarea) => void
-}
-
-export function Agenda(props: Props) {
+export function Agenda(props) {
   const { lunes, onCambiarSemana, onHoy, hoyClave } = props
   const dias = Array.from({ length: 7 }, (_, i) => sumarDias(lunes, i))
   const esEstaSemana = dias.includes(hoyClave)
@@ -64,8 +50,8 @@ export function Agenda(props: Props) {
   )
 }
 
-function VistaSemana({ dias, bloques, tareas, feriados, horario, hoyClave, ahoraMin, onAbrir }: Props & { dias: string[] }) {
-  const horas: number[] = []
+function VistaSemana({ dias, bloques, tareas, feriados, horario, hoyClave, ahoraMin, onAbrir }) {
+  const horas = []
   for (let m = horario.inicio; m < horario.fin; m += 60) horas.push(m)
   const alto = (horario.fin - horario.inicio) * PX_POR_MIN
 
@@ -148,7 +134,11 @@ function VistaSemana({ dias, bloques, tareas, feriados, horario, hoyClave, ahora
                   whileHover={{ scale: 1.03, zIndex: 5 }}
                   transition={{ type: 'spring', stiffness: 320, damping: 30 }}
                   className="absolute inset-x-1 flex flex-col items-start justify-start overflow-hidden rounded-xl border-l-4 px-2 py-1 text-left hyphens-auto [overflow-wrap:anywhere]"
-                  style={{ ...estiloBloque(t.materia), top: (b.inicio - horario.inicio) * PX_POR_MIN + 1.5, height: altoBloque }}
+                  style={{
+                    ...estiloBloque(t.materia),
+                    top: (b.inicio - horario.inicio) * PX_POR_MIN + 1.5,
+                    height: altoBloque,
+                  }}
                   aria-label={`${t.titulo}, ${hora(b.inicio)} a ${hora(b.fin)}`}
                   title={`${t.titulo} (${t.materia}), ${hora(b.inicio)} a ${hora(b.fin)}`}
                 >
@@ -189,7 +179,7 @@ function VistaSemana({ dias, bloques, tareas, feriados, horario, hoyClave, ahora
   )
 }
 
-function VistaDia({ dias, bloques, tareas, feriados, horario, hoyClave, onAbrir }: Props & { dias: string[] }) {
+function VistaDia({ dias, bloques, tareas, feriados, horario, hoyClave, onAbrir }) {
   const inicial = dias.includes(hoyClave) ? hoyClave : dias[0]
   const [elegido, setElegido] = useState(inicial)
   const dia = dias.includes(elegido) ? elegido : inicial
@@ -228,11 +218,26 @@ function VistaDia({ dias, bloques, tareas, feriados, horario, hoyClave, onAbrir 
 
       <AnimatePresence mode="popLayout" initial={false}>
         {feriado ? (
-          <Aviso key="feriado" icono={<PartyPopper size={20} aria-hidden />} titulo={`Feriado: ${feriado}`} texto="No te puse trabajo este día." />
+          <Aviso
+            key="feriado"
+            icono={<PartyPopper size={20} aria-hidden />}
+            titulo={`Feriado: ${feriado}`}
+            texto="No te puse trabajo este día."
+          />
         ) : !laborable ? (
-          <Aviso key="libre" icono={<CalendarOff size={20} aria-hidden />} titulo="Día libre" texto="No está en tu horario de trabajo." />
+          <Aviso
+            key="libre"
+            icono={<CalendarOff size={20} aria-hidden />}
+            titulo="Día libre"
+            texto="No está en tu horario de trabajo."
+          />
         ) : propios.length === 0 ? (
-          <Aviso key="vacio" icono={<CalendarOff size={20} aria-hidden />} titulo="Nada planificado" texto="Tenés este día libre." />
+          <Aviso
+            key="vacio"
+            icono={<CalendarOff size={20} aria-hidden />}
+            titulo="Nada planificado"
+            texto="Tenés este día libre."
+          />
         ) : (
           <ul key={dia} className="space-y-2">
             {propios.map((b, i) => {
@@ -263,7 +268,10 @@ function VistaDia({ dias, bloques, tareas, feriados, horario, hoyClave, onAbrir 
                         {b.partes > 1 && ` (parte ${b.parte} de ${b.partes})`}
                       </span>
                     </span>
-                    <span className="mt-1 size-2.5 shrink-0 rounded-full" style={{ background: colorMateria(t.materia).fuerte }} />
+                    <span
+                      className="mt-1 size-2.5 shrink-0 rounded-full"
+                      style={{ background: colorMateria(t.materia).fuerte }}
+                    />
                   </button>
                 </motion.li>
               )
@@ -275,7 +283,7 @@ function VistaDia({ dias, bloques, tareas, feriados, horario, hoyClave, onAbrir 
   )
 }
 
-function Aviso({ icono, titulo, texto }: { icono: React.ReactNode; titulo: string; texto: string }) {
+function Aviso({ icono, titulo, texto }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}

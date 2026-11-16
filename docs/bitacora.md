@@ -29,7 +29,7 @@ Registro del proceso, desde la idea hasta cada versión publicada. Herramienta d
 
 ### Qué se hizo
 
-- **Planificador** (`src/planificador.ts`): ordena las tareas pendientes por día de entrega y prioridad, y las ubica de lunes a viernes de 9 a 18, en el primer hueco libre a partir de este momento. Si una tarea no entra en un día, la parte y sigue al día siguiente. Deja 15 minutos de respiro entre tareas y marca **en rojo** las que terminarían después de su entrega.
+- **Planificador** (`src/planificador.js`): ordena las tareas pendientes por día de entrega y prioridad, y las ubica de lunes a viernes de 9 a 18, en el primer hueco libre a partir de este momento. Si una tarea no entra en un día, la parte y sigue al día siguiente. Deja 15 minutos de respiro entre tareas y marca **en rojo** las que terminarían después de su entrega.
 - **API de feriados**: se consultan los feriados del año actual y el siguiente. La agenda no pone trabajo esos días, los muestra rayados con su nombre, el calendario del formulario los marca con un punto y el resumen avisa cuál es el próximo. Justo el lunes 23/11 es feriado (Día de la Soberanía Nacional) y se ve en la demo.
 - **Firebase**:
   - Authentication con acceso **anónimo**: cada navegador tiene su propia agenda sin registrarse.
@@ -114,5 +114,6 @@ En `docs/capturas/`:
 - En la agenda semanal los títulos largos se cortaban (captura `v3-01`). Ahora ocupan hasta tres renglones, arrancan arriba del bloque y al pasar el mouse se ve el nombre completo (captura `v3-02`).
 - Ícono propio para la pestaña del navegador (antes era el de Vite).
 - README actualizado.
+- **El proyecto pasó de TypeScript a JavaScript** (archivos `.js` y `.jsx`), porque la cátedra lo pide en JavaScript. Se quitaron los tipos y la configuración de TypeScript, y el modelo de datos quedó documentado en `src/tipos.js`. Después del cambio se volvió a probar crear, borrar y recargar.
 
 **Verificación:** nueva publicación en Vercel y revisión de la URL de producción (captura `v3-03`).

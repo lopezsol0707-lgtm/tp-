@@ -8,19 +8,13 @@
  * - Marca "en riesgo" las tareas que terminarían después de su entrega.
  */
 import { aClave, desdeClave, sumarDias } from './fechas'
-import type { Bloque, EstadoTarea, Horario, Tarea } from './tipos'
 
-const PESO: Record<Tarea['prioridad'], number> = { alta: 0, media: 1, baja: 2 }
+const PESO = { alta: 0, media: 1, baja: 2 }
 const MINIMO_BLOQUE = 30
 const RESPIRO = 15
 const HORIZONTE_DIAS = 180
 
-export interface Plan {
-  bloques: Bloque[]
-  estados: Record<string, EstadoTarea>
-}
-
-export function ordenarPendientes(tareas: Tarea[]): Tarea[] {
+export function ordenarPendientes(tareas) {
   return tareas
     .filter((t) => !t.hecha)
     .sort(
@@ -29,11 +23,11 @@ export function ordenarPendientes(tareas: Tarea[]): Tarea[] {
     )
 }
 
-export function planificar(tareas: Tarea[], ahora: Date, horario: Horario, feriados: Map<string, string>): Plan {
+export function planificar(tareas, ahora, horario, feriados) {
   const hoyClave = aClave(ahora)
   const minutoActual = ahora.getHours() * 60 + ahora.getMinutes()
 
-  const esLaborable = (clave: string) => horario.dias.includes(desdeClave(clave).getDay()) && !feriados.has(clave)
+  const esLaborable = (clave) => horario.dias.includes(desdeClave(clave).getDay()) && !feriados.has(clave)
 
   // Cursor: el primer momento libre a partir de ahora, redondeado a 15 minutos.
   let fecha = hoyClave
@@ -51,12 +45,12 @@ export function planificar(tareas: Tarea[], ahora: Date, horario: Horario, feria
     }
   }
 
-  const bloques: Bloque[] = []
-  const estados: Record<string, EstadoTarea> = {}
+  const bloques = []
+  const estados = {}
 
   for (const t of ordenarPendientes(tareas)) {
     let restante = t.duracionMin
-    const propios: Bloque[] = []
+    const propios = []
 
     while (restante > 0) {
       acomodarCursor()

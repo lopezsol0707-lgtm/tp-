@@ -1,6 +1,3 @@
-import type { CSSProperties } from 'react'
-import type { Tarea } from './tipos'
-
 /** Paleta de materias: cada una recibe un color distinto. */
 // Orden validado para daltonismo (los colores vecinos se distinguen entre sí).
 const COLORES = [
@@ -12,14 +9,14 @@ const COLORES = [
   { fondo: '#d6efd6', tinta: '#0b5a0b', fuerte: '#008300' },
 ]
 
-const asignados = new Map<string, number>()
-const clave = (m: string) => m.trim().toLowerCase()
+const asignados = new Map()
+const clave = (m) => m.trim().toLowerCase()
 
 /**
  * Asigna los colores en el orden en que se cargó cada materia, así no se
  * repiten mientras haya menos de seis.
  */
-export function asignarColores(tareas: Tarea[]) {
+export function asignarColores(tareas) {
   asignados.clear()
   ;[...tareas]
     .sort((a, b) => a.creadaEn - b.creadaEn)
@@ -29,7 +26,7 @@ export function asignarColores(tareas: Tarea[]) {
     })
 }
 
-function indice(materia: string): number {
+function indice(materia) {
   const k = clave(materia)
   const fijo = asignados.get(k)
   if (fijo !== undefined) return fijo
@@ -37,11 +34,11 @@ function indice(materia: string): number {
   return asignados.size % COLORES.length
 }
 
-export function colorMateria(materia: string) {
+export function colorMateria(materia) {
   return COLORES[indice(materia)]
 }
 
-export function estiloBloque(materia: string): CSSProperties {
+export function estiloBloque(materia) {
   const c = colorMateria(materia)
   return { background: c.fondo, color: c.tinta, borderColor: c.fuerte }
 }

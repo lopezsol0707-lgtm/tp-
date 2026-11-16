@@ -20,11 +20,11 @@ TP2 de Desarrollo Frontend II (UADE, FADI, martes mañana). Joaquín lo arma par
 
 ## Estructura
 
-- `src/planificador.ts`: algoritmo (orden por entrega + prioridad, parte tareas entre días, 15 min de respiro, marca riesgo).
-- `src/data/tareas.ts`: CRUD Firestore (`usuarios/{uid}/tareas`) + `cargarEjemplo`.
-- `src/data/feriados.ts`: API de feriados.
-- `src/firebase.ts`: init y acceso anónimo.
-- `src/materias.ts`: color por materia, asignado por orden de creación.
+- `src/planificador.js`: algoritmo (orden por entrega + prioridad, parte tareas entre días, 15 min de respiro, marca riesgo).
+- `src/data/tareas.js`: CRUD Firestore (`usuarios/{uid}/tareas`) + `cargarEjemplo`.
+- `src/data/feriados.js`: API de feriados.
+- `src/firebase.js`: init y acceso anónimo.
+- `src/materias.js`: color por materia, asignado por orden de creación.
 - `src/components/`: Resumen, Agenda (semana en desktop, día en móvil), ListaTareas, FormularioTarea (calendario propio), DialogoBorrar, Hoja, Avisos, ui.
 - `docs/bitacora.md` + `docs/capturas/`: bitácora REAL. Solo pedidos, problemas y capturas que pasaron de verdad.
 
@@ -40,7 +40,7 @@ TP2 de Desarrollo Frontend II (UADE, FADI, martes mañana). Joaquín lo arma par
 ## Versiones publicadas
 
 - v1: agenda + Firestore + auth anónima + API feriados.
-- v2: ejemplo realista que se siembra solo la primera vez (flag `entrega.ejemplo.{uid}` en localStorage), botón "Volver al ejemplo inicial" (`reiniciarEjemplo`), gráficos (Estadisticas.tsx), hero animado. Fix: `asegurarUsuario` cachea la promesa (StrictMode creaba 2 anónimos) + reintento ante permission-denied.
+- v2: ejemplo realista que se siembra solo la primera vez (flag `entrega.ejemplo.{uid}` en localStorage), botón "Volver al ejemplo inicial" (`reiniciarEjemplo`), gráficos (Estadisticas.jsx), hero animado. Fix: `asegurarUsuario` cachea la promesa (StrictMode creaba 2 anónimos) + reintento ante permission-denied.
 - v3: títulos de bloques con line-clamp, favicon propio, README.
 
 ## Textos de entrega (fuera del repo, a propósito)

@@ -1,10 +1,8 @@
 import { animate, motion, useMotionValue, useTransform } from 'motion/react'
-import { LoaderCircle, type LucideIcon } from 'lucide-react'
-import { useEffect, type ButtonHTMLAttributes } from 'react'
+import { LoaderCircle } from 'lucide-react'
+import { useEffect } from 'react'
 
-type Variante = 'primario' | 'secundario' | 'peligro' | 'fantasma'
-
-const ESTILO_BOTON: Record<Variante, string> = {
+const ESTILO_BOTON = {
   primario: 'bg-primary text-primary-ink hover:brightness-105 sombra',
   secundario: 'bg-chip text-ink hover:brightness-[0.97]',
   peligro: 'bg-danger text-white hover:brightness-110',
@@ -19,14 +17,14 @@ export function Boton({
   className = '',
   disabled,
   ...resto
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variante?: Variante; cargando?: boolean; icono?: LucideIcon }) {
+}) {
   return (
     <motion.button
       whileTap={{ scale: 0.96 }}
       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
       disabled={disabled || cargando}
       className={`inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-[15px] font-bold transition-[filter,background-color] disabled:opacity-60 ${ESTILO_BOTON[variante]} ${className}`}
-      {...(resto as object)}
+      {...resto}
     >
       {cargando ? (
         <LoaderCircle size={18} className="animate-spin" aria-hidden />
@@ -38,12 +36,7 @@ export function Boton({
   )
 }
 
-export function BotonIcono({
-  icono: Icono,
-  etiqueta,
-  className = '',
-  ...resto
-}: ButtonHTMLAttributes<HTMLButtonElement> & { icono: LucideIcon; etiqueta: string }) {
+export function BotonIcono({ icono: Icono, etiqueta, className = '', ...resto }) {
   return (
     <button
       type="button"
@@ -57,26 +50,11 @@ export function BotonIcono({
   )
 }
 
-interface Opcion<T extends string> {
-  valor: T
-  etiqueta: string
-  icono?: LucideIcon
-}
-
-export function Segmentado<T extends string>({
-  id,
-  etiqueta,
-  opciones,
-  valor,
-  onChange,
-}: {
-  id: string
-  etiqueta: string
-  opciones: Opcion<T>[]
-  valor: T
-  onChange: (v: T) => void
-}) {
-  const indice = Math.max(0, opciones.findIndex((o) => o.valor === valor))
+export function Segmentado({ id, etiqueta, opciones, valor, onChange }) {
+  const indice = Math.max(
+    0,
+    opciones.findIndex((o) => o.valor === valor),
+  )
   return (
     <div role="radiogroup" aria-label={etiqueta} id={id} className="relative flex rounded-full bg-chip p-1">
       <span
@@ -110,7 +88,7 @@ export function Segmentado<T extends string>({
 }
 
 /** Número que cuenta hasta su valor. */
-export function Contador({ valor, formato = (v) => String(v) }: { valor: number; formato?: (v: number) => string }) {
+export function Contador({ valor, formato = (v) => String(v) }) {
   const mv = useMotionValue(0)
   const texto = useTransform(mv, (v) => formato(Math.round(v)))
   useEffect(() => {

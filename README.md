@@ -10,7 +10,7 @@ Además tiene una sección de **gráficos**: avance (tareas hechas), horas pendi
 
 ## Tecnologías
 
-- **React 19 + Vite + TypeScript**
+- **React 19 + Vite + JavaScript (archivos .js y .jsx)**
 - **Tailwind CSS v4** para los estilos y **Motion** para las animaciones
 - **Firebase**: Authentication (acceso anónimo) y **Cloud Firestore** (base de datos)
 - **API de feriados de ArgentinaDatos** (`https://api.argentinadatos.com/v1/feriados/{año}`): el planificador no pone trabajo los feriados y el calendario los marca.
@@ -64,10 +64,10 @@ Las reglas solo dejan leer y escribir las tareas propias y validan cada campo.
 
 ## Dónde está cada cosa
 
-- `src/firebase.ts`: conexión con Firebase y acceso anónimo.
-- `src/data/tareas.ts`: las operaciones con Firestore (consultar en tiempo real, agregar, modificar, eliminar).
-- `src/data/feriados.ts`: consulta a la API de feriados.
-- `src/planificador.ts`: el algoritmo que arma la agenda.
+- `src/firebase.js`: conexión con Firebase y acceso anónimo.
+- `src/data/tareas.js`: las operaciones con Firestore (consultar en tiempo real, agregar, modificar, eliminar).
+- `src/data/feriados.js`: consulta a la API de feriados.
+- `src/planificador.js`: el algoritmo que arma la agenda.
 - `src/components/`: interfaz (agenda semanal, lista de tareas, formulario, resumen).
 
 ## Publicar en Vercel

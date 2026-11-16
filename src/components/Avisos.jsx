@@ -1,14 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { CircleAlert, CircleCheckBig, X } from 'lucide-react'
 
-export interface Aviso {
-  id: number
-  tipo: 'ok' | 'error'
-  texto: string
-}
-
 /** Mensajes de éxito o error que aparecen abajo y se van solos. */
-export function Avisos({ avisos, onCerrar }: { avisos: Aviso[]; onCerrar: (id: number) => void }) {
+export function Avisos({ avisos, onCerrar }) {
   return (
     <div
       aria-live="polite"

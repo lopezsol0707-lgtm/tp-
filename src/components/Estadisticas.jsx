@@ -2,11 +2,8 @@ import { motion } from 'motion/react'
 import { useState } from 'react'
 import { desdeClave, diaCorto, diaLargo, duracion, sumarDias } from '../fechas'
 import { colorMateria } from '../materias'
-import type { Plan } from '../planificador'
-import type { Horario, Tarea } from '../tipos'
-
 /** Minutos a horas con coma decimal: 450 da "7,5 h". */
-const horas = (min: number) => `${(Math.round((min / 60) * 10) / 10).toLocaleString('es-AR')} h`
+const horas = (min) => `${(Math.round((min / 60) * 10) / 10).toLocaleString('es-AR')} h`
 
 const ENTRADA = {
   initial: { opacity: 0, y: 24 },
@@ -14,19 +11,7 @@ const ENTRADA = {
   viewport: { once: true, amount: 0.3 },
 }
 
-export function Estadisticas({
-  tareas,
-  plan,
-  feriados,
-  horario,
-  hoyClave,
-}: {
-  tareas: Tarea[]
-  plan: Plan
-  feriados: Map<string, string>
-  horario: Horario
-  hoyClave: string
-}) {
+export function Estadisticas({ tareas, plan, feriados, horario, hoyClave }) {
   return (
     <section aria-labelledby="titulo-stats" className="space-y-3">
       <h2 id="titulo-stats" className="titulo px-1 text-[26px] sm:text-[30px]">
@@ -43,7 +28,7 @@ export function Estadisticas({
   )
 }
 
-function Tarjeta({ titulo, sub, children, i = 0 }: { titulo: string; sub: string; children: React.ReactNode; i?: number }) {
+function Tarjeta({ titulo, sub, children, i = 0 }) {
   return (
     <motion.div
       {...ENTRADA}
@@ -58,7 +43,7 @@ function Tarjeta({ titulo, sub, children, i = 0 }: { titulo: string; sub: string
 }
 
 /** Anillo de avance: cuántas tareas ya están hechas. */
-function Avance({ tareas }: { tareas: Tarea[] }) {
+function Avance({ tareas }) {
   const hechas = tareas.filter((t) => t.hecha)
   const total = tareas.length
   const frac = total ? hechas.length / total : 0
@@ -101,9 +86,9 @@ function Avance({ tareas }: { tareas: Tarea[] }) {
 }
 
 /** Dona con las horas pendientes de cada materia. */
-function PorMateria({ tareas }: { tareas: Tarea[] }) {
-  const [activa, setActiva] = useState<string | null>(null)
-  const mapa = new Map<string, number>()
+function PorMateria({ tareas }) {
+  const [activa, setActiva] = useState(null)
+  const mapa = new Map()
   tareas.filter((t) => !t.hecha).forEach((t) => mapa.set(t.materia, (mapa.get(t.materia) ?? 0) + t.duracionMin))
   const datos = [...mapa.entries()].sort((a, b) => b[1] - a[1])
   const total = datos.reduce((s, [, m]) => s + m, 0)
@@ -123,7 +108,12 @@ function PorMateria({ tareas }: { tareas: Tarea[] }) {
       ) : (
         <div className="flex flex-col items-center gap-4 sm:flex-row md:flex-col xl:flex-col">
           <div className="relative size-36 shrink-0">
-            <svg viewBox="0 0 120 120" className="size-full -rotate-90" role="img" aria-label="Horas pendientes por materia">
+            <svg
+              viewBox="0 0 120 120"
+              className="size-full -rotate-90"
+              role="img"
+              aria-label="Horas pendientes por materia"
+            >
               {segmentos.map(({ m, frac, inicio }, i) => {
                 return (
                   <motion.circle
@@ -179,27 +169,15 @@ function PorMateria({ tareas }: { tareas: Tarea[] }) {
 }
 
 /** Barras apiladas: horas planificadas en los próximos días, por materia. */
-function Carga({
-  plan,
-  tareas,
-  feriados,
-  horario,
-  hoyClave,
-}: {
-  plan: Plan
-  tareas: Tarea[]
-  feriados: Map<string, string>
-  horario: Horario
-  hoyClave: string
-}) {
-  const [activo, setActivo] = useState<string | null>(null)
+function Carga({ plan, tareas, feriados, horario, hoyClave }) {
+  const [activo, setActivo] = useState(null)
   const porId = Object.fromEntries(tareas.map((t) => [t.id, t]))
   const dias = Array.from({ length: 12 }, (_, i) => sumarDias(hoyClave, i))
   const maxMin = horario.fin - horario.inicio
   const ALTO = 170
 
   const columnas = dias.map((d) => {
-    const porMateria = new Map<string, number>()
+    const porMateria = new Map()
     plan.bloques
       .filter((b) => b.fecha === d)
       .forEach((b) => {
@@ -214,7 +192,11 @@ function Carga({
   const lineas = [0, 3, 6, 9].filter((h) => h * 60 <= maxMin)
 
   return (
-    <Tarjeta titulo="Carga de los próximos 12 días" sub={`${horasTotales} planificadas, de lunes a viernes de 9 a 18`} i={2}>
+    <Tarjeta
+      titulo="Carga de los próximos 12 días"
+      sub={`${horasTotales} planificadas, de lunes a viernes de 9 a 18`}
+      i={2}
+    >
       <div className="relative pl-8">
         {lineas.map((h) => (
           <div

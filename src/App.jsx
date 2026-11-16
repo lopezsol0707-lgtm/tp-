@@ -1,7 +1,7 @@
 import { CalendarDays, ListTodo, Plus, RotateCcw, RotateCw, Sparkles, Zap } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Agenda } from './components/Agenda'
-import { Avisos, type Aviso } from './components/Avisos'
+import { Avisos } from './components/Avisos'
 import { DialogoBorrar } from './components/DialogoBorrar'
 import { FormularioTarea } from './components/FormularioTarea'
 import { Hoja } from './components/Hoja'
@@ -15,11 +15,8 @@ import { aClave, hoy, lunesDe, sumarDias } from './fechas'
 import { useFeriados, useTareas } from './hooks/useDatos'
 import { asignarColores } from './materias'
 import { planificar } from './planificador'
-import type { DatosTarea, Horario, Tarea } from './tipos'
 
-const HORARIO: Horario = { dias: [1, 2, 3, 4, 5], inicio: 9 * 60, fin: 18 * 60 }
-
-type Formulario = { modo: 'nueva' } | { modo: 'editar'; tarea: Tarea } | null
+const HORARIO = { dias: [1, 2, 3, 4, 5], inicio: 9 * 60, fin: 18 * 60 }
 
 function useAhora() {
   const [ahora, setAhora] = useState(() => new Date())
@@ -37,12 +34,12 @@ export default function App() {
   const hoyClave = aClave(ahora)
 
   const [lunes, setLunes] = useState(() => lunesDe(hoy()))
-  const [vista, setVista] = useState<'agenda' | 'tareas'>('agenda')
-  const [form, setForm] = useState<Formulario>(null)
-  const [aBorrar, setABorrar] = useState<Tarea | null>(null)
+  const [vista, setVista] = useState('agenda')
+  const [form, setForm] = useState(null)
+  const [aBorrar, setABorrar] = useState(null)
   const [cargandoEjemplo, setCargandoEjemplo] = useState(false)
   const [pedirReinicio, setReiniciar] = useState(false)
-  const [avisos, setAvisos] = useState<Aviso[]>([])
+  const [avisos, setAvisos] = useState([])
   const proximoAviso = useRef(1)
 
   const plan = useMemo(() => planificar(tareas, ahora, HORARIO, feriados), [tareas, ahora, feriados])
@@ -52,13 +49,13 @@ export default function App() {
     return [...new Set(tareas.map((t) => t.materia))]
   }, [tareas])
 
-  const avisar = useCallback((tipo: Aviso['tipo'], texto: string) => {
+  const avisar = useCallback((tipo, texto) => {
     const id = proximoAviso.current++
     setAvisos((l) => [...l.slice(-2), { id, tipo, texto }])
     window.setTimeout(() => setAvisos((l) => l.filter((a) => a.id !== id)), 4500)
   }, [])
 
-  async function guardar(datos: DatosTarea) {
+  async function guardar(datos) {
     if (!uid) throw new Error('Sin usuario')
     if (form?.modo === 'editar') {
       await actualizarTarea(uid, form.tarea.id, datos)
@@ -70,7 +67,7 @@ export default function App() {
     setForm(null)
   }
 
-  async function alternar(t: Tarea) {
+  async function alternar(t) {
     if (!uid) return
     try {
       await actualizarTarea(uid, t.id, { hecha: !t.hecha, hechaEn: t.hecha ? null : Date.now() })
@@ -80,7 +77,7 @@ export default function App() {
     }
   }
 
-  async function borrar(t: Tarea) {
+  async function borrar(t) {
     if (!uid) return
     try {
       await eliminarTarea(uid, t.id)
@@ -135,7 +132,7 @@ export default function App() {
     }
   }
 
-  const abrir = (t: Tarea) => setForm({ modo: 'editar', tarea: t })
+  const abrir = (t) => setForm({ modo: 'editar', tarea: t })
   const cerrarForm = useCallback(() => setForm(null), [])
   const cancelarBorrar = useCallback(() => setABorrar(null), [])
   const cerrarReinicio = useCallback(() => setReiniciar(false), [])
@@ -200,14 +197,18 @@ export default function App() {
             ) : (
               <>
                 <div className="lg:hidden">
-                  <Segmentado<'agenda' | 'tareas'>
+                  <Segmentado
                     id="vista"
                     etiqueta="Vista"
                     valor={vista}
                     onChange={setVista}
                     opciones={[
                       { valor: 'agenda', etiqueta: 'Agenda', icono: CalendarDays },
-                      { valor: 'tareas', etiqueta: `Tareas (${tareas.filter((t) => !t.hecha).length})`, icono: ListTodo },
+                      {
+                        valor: 'tareas',
+                        etiqueta: `Tareas (${tareas.filter((t) => !t.hecha).length})`,
+                        icono: ListTodo,
+                      },
                     ]}
                   />
                 </div>
@@ -283,7 +284,7 @@ export default function App() {
   )
 }
 
-function Vacio({ titulo, texto, accion }: { titulo: string; texto: string; accion: ReactNode }) {
+function Vacio({ titulo, texto, accion }) {
   return (
     <div className="flex flex-col items-center rounded-[var(--radius)] border-2 border-dashed border-line px-6 py-12 text-center">
       <span className="mb-4 grid size-16 place-items-center rounded-full bg-chip text-primary">

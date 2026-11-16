@@ -1,9 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { ChevronLeft, ChevronRight, CircleAlert, Minus, Plus } from 'lucide-react'
-import { useId, useState, type ReactNode } from 'react'
+import { useId, useState } from 'react'
 import { aClave, desdeClave, diaLargo, duracion, hoy, mesLargo, sumarDias } from '../fechas'
 import { colorMateria } from '../materias'
-import type { DatosTarea, Prioridad, Tarea } from '../tipos'
 import { Boton, BotonIcono, Segmentado } from './ui'
 
 const CAMPO =
@@ -11,10 +10,8 @@ const CAMPO =
 
 const DURACIONES = [30, 60, 120, 180, 240]
 
-type Errores = Partial<Record<'titulo' | 'materia' | 'fechaLimite', string>>
-
-function validar(d: DatosTarea): Errores {
-  const e: Errores = {}
+function validar(d) {
+  const e = {}
   const titulo = d.titulo.trim()
   if (titulo.length < 2) e.titulo = 'Poné un nombre de al menos 2 letras.'
   else if (titulo.length > 60) e.titulo = 'Usá un nombre más corto (hasta 60 letras).'
@@ -25,21 +22,9 @@ function validar(d: DatosTarea): Errores {
   return e
 }
 
-export function FormularioTarea({
-  inicial,
-  materias,
-  feriados,
-  onGuardar,
-  onCancelar,
-}: {
-  inicial?: Tarea
-  materias: string[]
-  feriados: Map<string, string>
-  onGuardar: (d: DatosTarea) => Promise<void>
-  onCancelar: () => void
-}) {
+export function FormularioTarea({ inicial, materias, feriados, onGuardar, onCancelar }) {
   const base = useId()
-  const [d, setD] = useState<DatosTarea>(() =>
+  const [d, setD] = useState(() =>
     inicial
       ? {
           titulo: inicial.titulo,
@@ -51,19 +36,19 @@ export function FormularioTarea({
       : { titulo: '', materia: '', duracionMin: 120, fechaLimite: '', prioridad: 'media' },
   )
   const [intentado, setIntentado] = useState(false)
-  const [tocados, setTocados] = useState<Record<string, boolean>>({})
+  const [tocados, setTocados] = useState({})
   const [guardando, setGuardando] = useState(false)
-  const [errorGeneral, setErrorGeneral] = useState<string | null>(null)
+  const [errorGeneral, setErrorGeneral] = useState(null)
 
   const errores = validar(d)
-  const ver = (k: keyof Errores) => (intentado || tocados[k] ? errores[k] : undefined)
-  const set = <K extends keyof DatosTarea>(k: K, v: DatosTarea[K]) => setD((p) => ({ ...p, [k]: v }))
+  const ver = (k) => (intentado || tocados[k] ? errores[k] : undefined)
+  const set = (k, v) => setD((p) => ({ ...p, [k]: v }))
 
-  async function enviar(ev: React.FormEvent) {
+  async function enviar(ev) {
     ev.preventDefault()
     setIntentado(true)
     setErrorGeneral(null)
-    const claves = Object.keys(errores) as (keyof Errores)[]
+    const claves = Object.keys(errores)
     if (claves.length) {
       document.getElementById(`${base}-${claves[0]}`)?.focus()
       return
@@ -158,7 +143,9 @@ export function FormularioTarea({
                 aria-pressed={d.duracionMin === m}
                 onClick={() => set('duracionMin', m)}
                 className={`min-h-10 rounded-full border-2 text-[13px] font-bold transition-colors ${
-                  d.duracionMin === m ? 'border-primary bg-primary text-primary-ink' : 'border-line hover:border-muted/40'
+                  d.duracionMin === m
+                    ? 'border-primary bg-primary text-primary-ink'
+                    : 'border-line hover:border-muted/40'
                 }`}
               >
                 {m < 60 ? `${m} min` : `${m / 60} h`}
@@ -180,7 +167,7 @@ export function FormularioTarea({
         </Campo>
 
         <Campo etiqueta="Prioridad">
-          <Segmentado<Prioridad>
+          <Segmentado
             id={`${base}-prioridad`}
             etiqueta="Prioridad"
             valor={d.prioridad}
@@ -191,7 +178,9 @@ export function FormularioTarea({
               { valor: 'baja', etiqueta: 'Baja' },
             ]}
           />
-          <p className="mt-1.5 text-[13px] text-muted">Si dos tareas vencen el mismo día, va primero la de mayor prioridad.</p>
+          <p className="mt-1.5 text-[13px] text-muted">
+            Si dos tareas vencen el mismo día, va primero la de mayor prioridad.
+          </p>
         </Campo>
 
         <AnimatePresence>
@@ -222,10 +211,12 @@ export function FormularioTarea({
   )
 }
 
-function Campo({ id, etiqueta, error, children }: { id?: string; etiqueta: string; error?: string; children: ReactNode }) {
+function Campo({ id, etiqueta, error, children }) {
   return (
     <div>
-      <div className="mb-2 text-[14px] font-bold">{id ? <label htmlFor={id}>{etiqueta}</label> : <span>{etiqueta}</span>}</div>
+      <div className="mb-2 text-[14px] font-bold">
+        {id ? <label htmlFor={id}>{etiqueta}</label> : <span>{etiqueta}</span>}
+      </div>
       {children}
       {error && (
         <p role="alert" className="mt-1.5 flex items-center gap-1.5 text-[14px] font-semibold text-danger">
@@ -238,17 +229,7 @@ function Campo({ id, etiqueta, error, children }: { id?: string; etiqueta: strin
 }
 
 /** Calendario propio para elegir la fecha de entrega (marca feriados). */
-function Calendario({
-  id,
-  valor,
-  feriados,
-  onElegir,
-}: {
-  id: string
-  valor: string
-  feriados: Map<string, string>
-  onElegir: (f: string) => void
-}) {
+function Calendario({ id, valor, feriados, onElegir }) {
   const hoyClave = hoy()
   const [mes, setMes] = useState(() => {
     const d = desdeClave(valor || hoyClave)
@@ -257,8 +238,11 @@ function Calendario({
   const primero = desdeClave(mes)
   const offset = (primero.getDay() + 6) % 7
   const diasMes = new Date(primero.getFullYear(), primero.getMonth() + 1, 0).getDate()
-  const celdas = [...Array.from({ length: offset }, () => null), ...Array.from({ length: diasMes }, (_, i) => sumarDias(mes, i))]
-  const cambiarMes = (n: number) => setMes(aClave(new Date(primero.getFullYear(), primero.getMonth() + n, 1)))
+  const celdas = [
+    ...Array.from({ length: offset }, () => null),
+    ...Array.from({ length: diasMes }, (_, i) => sumarDias(mes, i)),
+  ]
+  const cambiarMes = (n) => setMes(aClave(new Date(primero.getFullYear(), primero.getMonth() + n, 1)))
   const feriadoElegido = valor ? feriados.get(valor) : undefined
 
   return (
@@ -289,11 +273,7 @@ function Calendario({
               title={feriado}
               onClick={() => onElegir(c)}
               className={`relative grid aspect-square min-h-9 place-items-center rounded-full text-[14px] font-bold tabular-nums transition-colors disabled:opacity-30 ${
-                elegido
-                  ? 'bg-primary text-primary-ink'
-                  : c === hoyClave
-                    ? 'bg-chip text-primary'
-                    : 'hover:bg-chip'
+                elegido ? 'bg-primary text-primary-ink' : c === hoyClave ? 'bg-chip text-primary' : 'hover:bg-chip'
               }`}
             >
               {desdeClave(c).getDate()}
@@ -308,7 +288,9 @@ function Calendario({
         })}
       </div>
       <p className="mt-2 text-[13px] font-semibold text-muted">
-        {valor ? `Entrega: ${diaLargo(valor)}${feriadoElegido ? ` (feriado: ${feriadoElegido})` : ''}` : 'Los puntitos marcan feriados.'}
+        {valor
+          ? `Entrega: ${diaLargo(valor)}${feriadoElegido ? ` (feriado: ${feriadoElegido})` : ''}`
+          : 'Los puntitos marcan feriados.'}
       </p>
     </div>
   )

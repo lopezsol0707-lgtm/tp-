@@ -5,7 +5,7 @@
  * Los datos de conexión vienen de las variables de entorno VITE_FIREBASE_*.
  */
 import { initializeApp } from 'firebase/app'
-import { getAuth, onAuthStateChanged, signInAnonymously, type User } from 'firebase/auth'
+import { getAuth, onAuthStateChanged, signInAnonymously } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
 const app = initializeApp({
@@ -18,13 +18,13 @@ const app = initializeApp({
 export const auth = getAuth(app)
 export const db = getFirestore(app)
 
-let pendiente: Promise<User> | null = null
+let pendiente = null
 
 /**
  * Devuelve el usuario actual; si no hay, entra como anónimo.
  * Se guarda la promesa para no crear dos usuarios si se llama dos veces seguidas.
  */
-export function asegurarUsuario(): Promise<User> {
+export function asegurarUsuario() {
   pendiente ??= crearOObtenerUsuario().catch((e) => {
     pendiente = null
     throw e
@@ -32,7 +32,7 @@ export function asegurarUsuario(): Promise<User> {
   return pendiente
 }
 
-function crearOObtenerUsuario(): Promise<User> {
+function crearOObtenerUsuario() {
   return new Promise((resolve, reject) => {
     const cortar = onAuthStateChanged(
       auth,

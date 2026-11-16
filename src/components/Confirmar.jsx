@@ -4,20 +4,12 @@ import { useEffect, useState } from 'react'
 import { Boton } from './ui'
 
 /** Confirmación para volver al ejemplo inicial. */
-export function Confirmar({
-  abierto,
-  onConfirmar,
-  onCancelar,
-}: {
-  abierto: boolean
-  onConfirmar: () => Promise<void>
-  onCancelar: () => void
-}) {
+export function Confirmar({ abierto, onConfirmar, onCancelar }) {
   const [trabajando, setTrabajando] = useState(false)
 
   useEffect(() => {
     if (!abierto) return
-    const tecla = (e: KeyboardEvent) => e.key === 'Escape' && !trabajando && onCancelar()
+    const tecla = (e) => e.key === 'Escape' && !trabajando && onCancelar()
     window.addEventListener('keydown', tecla)
     return () => window.removeEventListener('keydown', tecla)
   }, [abierto, onCancelar, trabajando])

@@ -2,24 +2,23 @@ import { useEffect, useState } from 'react'
 import { obtenerFeriados } from '../data/feriados'
 import { escucharTareas } from '../data/tareas'
 import { asegurarUsuario } from '../firebase'
-import type { Tarea } from '../tipos'
 
 /** Entra como anónimo y escucha las tareas del usuario en tiempo real. */
 export function useTareas() {
-  const [uid, setUid] = useState<string | null>(null)
-  const [tareas, setTareas] = useState<Tarea[]>([])
+  const [uid, setUid] = useState(null)
+  const [tareas, setTareas] = useState([])
   const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState(null)
   const [intento, setIntento] = useState(0)
 
   useEffect(() => {
-    let cortar: (() => void) | undefined
+    let cortar
     let vigente = true
     let reintentos = 0
 
     // Un usuario anónimo recién creado puede tardar un instante en tener
     // permiso en Firestore. Si la primera lectura rebota, reintentamos solos.
-    const escuchar = (uidActual: string) => {
+    const escuchar = (uidActual) => {
       cortar = escucharTareas(
         uidActual,
         (lista) => {
@@ -29,7 +28,7 @@ export function useTareas() {
         },
         (e) => {
           if (!vigente) return
-          const code = (e as { code?: string }).code
+          const code = e.code
           if (code === 'permission-denied' && reintentos < 4) {
             reintentos++
             cortar?.()
@@ -73,8 +72,8 @@ export function useTareas() {
 
 /** Trae los feriados del año actual y el siguiente desde la API. */
 export function useFeriados() {
-  const [feriados, setFeriados] = useState<Map<string, string>>(new Map())
-  const [estado, setEstado] = useState<'cargando' | 'listo' | 'error'>('cargando')
+  const [feriados, setFeriados] = useState(new Map())
+  const [estado, setEstado] = useState('cargando')
   const [intento, setIntento] = useState(0)
 
   useEffect(() => {

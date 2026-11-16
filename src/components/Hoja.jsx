@@ -1,32 +1,18 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { X } from 'lucide-react'
-import { useEffect, useId, type ReactNode } from 'react'
+import { useEffect, useId } from 'react'
 import { BotonIcono } from './ui'
 
 /**
  * Ventana que sube desde abajo en el celular y aparece centrada en la compu.
  * Se cierra con Escape, con la X o tocando afuera.
  */
-export function Hoja({
-  abierta,
-  onCerrar,
-  titulo,
-  children,
-  pie,
-  ancho = 'sm:max-w-xl',
-}: {
-  abierta: boolean
-  onCerrar: () => void
-  titulo: string
-  children: ReactNode
-  pie?: ReactNode
-  ancho?: string
-}) {
+export function Hoja({ abierta, onCerrar, titulo, children, pie, ancho = 'sm:max-w-xl' }) {
   const idTitulo = useId()
 
   useEffect(() => {
     if (!abierta) return
-    const alTeclear = (e: KeyboardEvent) => e.key === 'Escape' && onCerrar()
+    const alTeclear = (e) => e.key === 'Escape' && onCerrar()
     const overflowPrevio = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', alTeclear)

@@ -4,20 +4,11 @@ import { useState } from 'react'
 import { duracion, fechaRelativa } from '../fechas'
 import { colorMateria } from '../materias'
 import { ordenarPendientes } from '../planificador'
-import type { EstadoTarea, Tarea } from '../tipos'
 import { BotonIcono } from './ui'
 
 const PRIORIDAD = { alta: 'Prioridad alta', media: 'Prioridad media', baja: 'Prioridad baja' }
 
-interface Props {
-  tareas: Tarea[]
-  estados: Record<string, EstadoTarea>
-  onAlternar: (t: Tarea) => Promise<void>
-  onEditar: (t: Tarea) => void
-  onBorrar: (t: Tarea) => void
-}
-
-export function ListaTareas({ tareas, estados, onAlternar, onEditar, onBorrar }: Props) {
+export function ListaTareas({ tareas, estados, onAlternar, onEditar, onBorrar }) {
   const [verHechas, setVerHechas] = useState(false)
   const pendientes = ordenarPendientes(tareas)
   const hechas = tareas.filter((t) => t.hecha).sort((a, b) => (b.hechaEn ?? 0) - (a.hechaEn ?? 0))
@@ -34,7 +25,14 @@ export function ListaTareas({ tareas, estados, onAlternar, onEditar, onBorrar }:
         <ul className="space-y-2">
           <AnimatePresence initial={false} mode="popLayout">
             {pendientes.map((t) => (
-              <Item key={t.id} t={t} estado={estados[t.id]} onAlternar={onAlternar} onEditar={onEditar} onBorrar={onBorrar} />
+              <Item
+                key={t.id}
+                t={t}
+                estado={estados[t.id]}
+                onAlternar={onAlternar}
+                onEditar={onEditar}
+                onBorrar={onBorrar}
+              />
             ))}
           </AnimatePresence>
         </ul>
@@ -71,19 +69,7 @@ export function ListaTareas({ tareas, estados, onAlternar, onEditar, onBorrar }:
   )
 }
 
-function Item({
-  t,
-  estado,
-  onAlternar,
-  onEditar,
-  onBorrar,
-}: {
-  t: Tarea
-  estado?: EstadoTarea
-  onAlternar: (t: Tarea) => Promise<void>
-  onEditar: (t: Tarea) => void
-  onBorrar: (t: Tarea) => void
-}) {
+function Item({ t, estado, onAlternar, onEditar, onBorrar }) {
   const [guardando, setGuardando] = useState(false)
   const color = colorMateria(t.materia)
 
@@ -96,7 +82,7 @@ function Item({
     }
   }
 
-  let linea: { texto: string; riesgo: boolean } | null = null
+  let linea = null
   if (!t.hecha && estado) {
     if (estado.vencida) linea = { texto: `Se venció ${fechaRelativa(t.fechaLimite)}`, riesgo: true }
     else if (estado.termina === null) linea = { texto: 'No entra en tu agenda', riesgo: true }
@@ -131,7 +117,12 @@ function Item({
           style={{ borderColor: color.fuerte, background: t.hecha ? color.fuerte : 'transparent' }}
         >
           {guardando ? (
-            <LoaderCircle size={14} className="animate-spin" style={{ color: t.hecha ? '#fff' : color.fuerte }} aria-hidden />
+            <LoaderCircle
+              size={14}
+              className="animate-spin"
+              style={{ color: t.hecha ? '#fff' : color.fuerte }}
+              aria-hidden
+            />
           ) : (
             t.hecha && <Check size={16} strokeWidth={3.4} className="text-white" aria-hidden />
           )}

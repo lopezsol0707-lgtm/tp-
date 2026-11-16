@@ -1,20 +1,13 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import type { Tarea } from '../tipos'
 import { Boton } from './ui'
 
-interface Props {
-  tarea: Tarea | null
-  onConfirmar: (t: Tarea) => Promise<void>
-  onCancelar: () => void
-}
-
 /** Confirmación antes de borrar una tarea (no se puede deshacer). */
-export function DialogoBorrar({ tarea, onConfirmar, onCancelar }: Props) {
+export function DialogoBorrar({ tarea, onConfirmar, onCancelar }) {
   useEffect(() => {
     if (!tarea) return
-    const tecla = (e: KeyboardEvent) => e.key === 'Escape' && onCancelar()
+    const tecla = (e) => e.key === 'Escape' && onCancelar()
     window.addEventListener('keydown', tecla)
     return () => window.removeEventListener('keydown', tecla)
   }, [tarea, onCancelar])
@@ -37,7 +30,7 @@ export function DialogoBorrar({ tarea, onConfirmar, onCancelar }: Props) {
   )
 }
 
-function Contenido({ tarea, onConfirmar, onCancelar }: Props & { tarea: Tarea }) {
+function Contenido({ tarea, onConfirmar, onCancelar }) {
   const [borrando, setBorrando] = useState(false)
   async function confirmar() {
     setBorrando(true)
@@ -64,7 +57,9 @@ function Contenido({ tarea, onConfirmar, onCancelar }: Props & { tarea: Tarea })
       <h2 id="titulo-borrar" className="titulo text-[24px]">
         ¿Borrar "{tarea.titulo}"?
       </h2>
-      <p className="mt-2 text-[15px] text-muted">La sacamos de tu agenda y se reacomoda el resto. No se puede deshacer.</p>
+      <p className="mt-2 text-[15px] text-muted">
+        La sacamos de tu agenda y se reacomoda el resto. No se puede deshacer.
+      </p>
       <div className="mt-6 flex flex-col gap-2">
         <Boton variante="peligro" cargando={borrando} onClick={confirmar} autoFocus>
           {borrando ? 'Borrando' : 'Sí, borrar'}

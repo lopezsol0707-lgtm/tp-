@@ -1,25 +1,9 @@
 import { motion } from 'motion/react'
 import { CalendarHeart, Hourglass, PlayCircle, TriangleAlert } from 'lucide-react'
 import { diaLargo, duracion, fechaRelativa, hora, hoy, sumarDias } from '../fechas'
-import type { Plan } from '../planificador'
-import type { Tarea } from '../tipos'
 import { Contador } from './ui'
 
-export function Resumen({
-  plan,
-  tareas,
-  feriados,
-  estadoFeriados,
-  onReintentarFeriados,
-  lunes,
-}: {
-  plan: Plan
-  tareas: Tarea[]
-  feriados: Map<string, string>
-  estadoFeriados: 'cargando' | 'listo' | 'error'
-  onReintentarFeriados: () => void
-  lunes: string
-}) {
+export function Resumen({ plan, tareas, feriados, estadoFeriados, onReintentarFeriados, lunes }) {
   const hoyClave = hoy()
   const domingo = sumarDias(lunes, 6)
   const minutosSemana = plan.bloques
@@ -29,7 +13,9 @@ export function Resumen({
   const enRiesgo = pendientes.filter((t) => plan.estados[t.id]?.enRiesgo).length
   const proximo = plan.bloques[0]
   const tareaProxima = proximo && tareas.find((t) => t.id === proximo.tareaId)
-  const proximoFeriado = [...feriados.entries()].filter(([f]) => f >= hoyClave).sort(([a], [b]) => a.localeCompare(b))[0]
+  const proximoFeriado = [...feriados.entries()]
+    .filter(([f]) => f >= hoyClave)
+    .sort(([a], [b]) => a.localeCompare(b))[0]
 
   return (
     <motion.section
@@ -66,7 +52,11 @@ export function Resumen({
         />
         <Dato
           icono={enRiesgo ? <TriangleAlert size={20} aria-hidden /> : <Hourglass size={20} aria-hidden />}
-          titulo={enRiesgo ? `${enRiesgo} ${enRiesgo === 1 ? 'entrega no llega' : 'entregas no llegan'}` : 'Todo llega a tiempo'}
+          titulo={
+            enRiesgo
+              ? `${enRiesgo} ${enRiesgo === 1 ? 'entrega no llega' : 'entregas no llegan'}`
+              : 'Todo llega a tiempo'
+          }
           texto={
             enRiesgo
               ? 'Están marcadas en rojo en la lista.'
@@ -80,7 +70,11 @@ export function Resumen({
         <Dato
           icono={<CalendarHeart size={20} aria-hidden />}
           titulo={
-            estadoFeriados === 'error' ? 'Sin datos de feriados' : estadoFeriados === 'cargando' ? 'Buscando feriados' : 'Próximo feriado'
+            estadoFeriados === 'error'
+              ? 'Sin datos de feriados'
+              : estadoFeriados === 'cargando'
+                ? 'Buscando feriados'
+                : 'Próximo feriado'
           }
           texto={
             estadoFeriados === 'error'
@@ -91,7 +85,11 @@ export function Resumen({
           }
           accion={
             estadoFeriados === 'error' ? (
-              <button type="button" onClick={onReintentarFeriados} className="mt-1 text-[14px] font-extrabold underline">
+              <button
+                type="button"
+                onClick={onReintentarFeriados}
+                className="mt-1 text-[14px] font-extrabold underline"
+              >
                 Reintentar
               </button>
             ) : null
@@ -103,21 +101,7 @@ export function Resumen({
   )
 }
 
-function Dato({
-  icono,
-  titulo,
-  texto,
-  alerta,
-  accion,
-  orden,
-}: {
-  icono: React.ReactNode
-  titulo: string
-  texto: string
-  alerta?: boolean
-  accion?: React.ReactNode
-  orden?: number
-}) {
+function Dato({ icono, titulo, texto, alerta, accion, orden }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 14, scale: 0.97 }}
